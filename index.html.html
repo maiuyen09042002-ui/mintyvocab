@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MintyVocab – Học từ vựng theo chủ đề</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ✏️ ĐỔI MÀU: sửa các mã màu ngay dưới đây (--pri = xanh ngọc chính, --pink = hồng nhấn, --grad = dải màu nút/tab) */
+:root{
+  --bg:#f3f9ff;--card:#fff;--soft:#e2f5ff;--line:#cfe3ff;--pri:#00a896;--pri-ink:#fff;
+  --ink:#1d2a4a;--mut:#62708f;--pink:#ff5d8f;--pink-soft:#ffe0ea;--sun:#ffe46b;--sun-ink:#6b4200;
+  --ok:#12b886;--bad:#f03e6b;
+  --grad:linear-gradient(135deg,#00c9a7,#4c6ef5);--grad2:linear-gradient(135deg,#ff6fa5,#ff9a4d);
+  --bgimg:radial-gradient(circle at 8% 0,#ffdcec 0,transparent 32%),radial-gradient(circle at 96% 8%,#cffff0 0,transparent 34%),radial-gradient(circle at 50% 100%,#fff0b3 0,transparent 40%);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a33;--card:#1d2547;--soft:#27316a;--line:#38458a;--pri:#2ee6c8;--pri-ink:#06221d;
+  --ink:#eef1ff;--mut:#a9b3e0;--pink-soft:#4a2540;--sun:#4a3d12;--sun-ink:#ffe28a;--bad:#ff8fb0;--ok:#2ee6c8;
+  --grad:linear-gradient(135deg,#2ee6c8,#8fb0ff);--bgimg:none}}
+:root[data-theme="dark"]{--bg:#141a33;--card:#1d2547;--soft:#27316a;--line:#38458a;--pri:#2ee6c8;--pri-ink:#06221d;--ink:#eef1ff;--mut:#a9b3e0;--pink-soft:#4a2540;--sun:#4a3d12;--sun-ink:#ffe28a;--bad:#ff8fb0;--ok:#2ee6c8;--grad:linear-gradient(135deg,#2ee6c8,#8fb0ff);--bgimg:none}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+header{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:12px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.logo{font-family:'Fredoka',sans-serif;font-size:24px;font-weight:600;color:var(--pri)}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:7px 15px;border-radius:99px;background:var(--bg);font-weight:800;font-size:14px;border:2px solid transparent;transition:.15s}
+.pill:hover{background:var(--soft)}
+.pill.on{background:var(--pri);color:var(--pri-ink)}
+.stat{background:var(--sun);color:var(--sun-ink);padding:6px 14px;border-radius:99px;font-weight:800;font-size:13px}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{flex:1;padding:11px;border-radius:16px;background:var(--card);border:2px solid var(--line);font-weight:800}
+.tab.on{background:var(--pri);color:var(--pri-ink);border-color:var(--pri)}
+.grid{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+.list{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:14px;text-align:left;border:2px solid transparent}
+.item:hover{background:var(--bg)}
+.item.on{background:var(--soft);border-color:var(--line)}
+.item .em{font-size:24px}
+.item b{display:block;font-size:15px}
+.dots{display:flex;gap:3px;margin-top:2px}
+.dots i{width:14px;height:5px;border-radius:9px;background:var(--line)}
+.dots i.f{background:var(--pri)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 10px 26px rgba(15,157,134,.08)}
+.top{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center}
+.pic{aspect-ratio:1;border-radius:32px;background:radial-gradient(circle at 30% 25%,var(--card),var(--soft) 70%);border:3px dashed var(--line);display:grid;place-items:center;font-size:84px;position:relative}
+.pic::after{content:"✨";position:absolute;top:8px;right:12px;font-size:20px}
+.word{font-family:'Fredoka',sans-serif;font-size:38px;font-weight:600;color:var(--pri);line-height:1.15}
+.ipa{color:var(--mut);font-weight:700}
+.pos{display:inline-block;background:var(--pink-soft);color:var(--bad);border-radius:99px;padding:1px 10px;font-size:12px;font-weight:800;margin-left:6px}
+.vi{font-size:20px;font-weight:800;margin:6px 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--soft);padding:8px 14px;border-radius:99px;font-weight:800;font-size:14px;transition:.15s}
+.btn:hover{background:var(--pri);color:var(--pri-ink)}
+.btn.solid{background:var(--pri);color:var(--pri-ink)}
+h3{font-family:'Fredoka',sans-serif;font-size:17px;font-weight:500;margin:20px 0 8px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.col{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;text-align:left}
+.col:hover{border-color:var(--pri)}
+.col b{display:block}.col small{color:var(--mut);font-weight:700}
+.chip{background:var(--sun);color:var(--sun-ink);padding:5px 12px;border-radius:99px;font-weight:800;font-size:14px}
+.chip small{opacity:.75;font-weight:700}
+.ex{background:var(--bg);border-left:5px solid var(--pri);border-radius:14px;padding:12px 14px}
+.ex mark{background:var(--soft);color:var(--pri);padding:0 4px;border-radius:6px;font-weight:800}
+.ex small{display:block;color:var(--mut);font-weight:700}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:20px;flex-wrap:wrap}
+.bar{height:10px;background:var(--soft);border-radius:9px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;background:var(--pri);transition:width .3s}
+.qtype{color:var(--mut);font-weight:800;font-size:14px}
+.q{font-family:'Fredoka',sans-serif;font-size:22px;margin:6px 0 14px}
+.big{font-size:90px;text-align:center;margin:6px 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{padding:13px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-weight:800;font-size:16px}
+.opt:hover:not(:disabled){border-color:var(--pri);background:var(--soft)}
+.opt.ok{background:var(--ok);color:var(--pri-ink);border-color:var(--ok)}
+.opt.bad{background:var(--pink-soft);color:var(--bad);border-color:var(--bad)}
+input[type=text]{width:100%;padding:13px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:800 18px 'Nunito',sans-serif;margin-bottom:10px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:14px;font-weight:700}
+.fb.ok{background:var(--soft);color:var(--pri)}.fb.bad{background:var(--pink-soft);color:var(--bad)}
+.end{text-align:center;padding:20px 0}.end .big{font-size:72px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.list{flex-direction:row;overflow-x:auto}.item{flex:0 0 auto}.top{grid-template-columns:110px 1fr}.pic{font-size:58px;border-radius:24px}.word{font-size:30px}.opts{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== Giao diện tươi sáng + flashcard ===== */
+body{background-color:var(--bg);background-image:var(--bgimg);background-attachment:fixed}
+header{border:0;border-top:6px solid var(--pink);box-shadow:0 8px 24px rgba(76,110,245,.14)}
+.logo{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:27px}
+.stat{background:var(--grad2);color:#fff}
+.pill.on,.tab.on,.btn.solid{background:var(--grad);color:var(--pri-ink);border-color:transparent}
+.tab{transition:.15s}.tab:hover{transform:translateY(-2px)}
+.card,.list{box-shadow:0 12px 30px rgba(76,110,245,.12)}
+.item.on{background:linear-gradient(135deg,var(--soft),var(--pink-soft))}
+.item.known b{opacity:.55}
+.btn:hover{transform:translateY(-2px)}
+.btn.bad{background:var(--pink-soft);color:var(--bad)}.btn.bad:hover{background:var(--bad);color:#fff}
+.btn.ok{background:var(--ok);color:var(--pri-ink)}
+.chip:nth-child(3n+2){background:var(--pink-soft);color:var(--bad)}
+.chip:nth-child(3n){background:var(--soft);color:var(--pri)}
+.def{background:var(--sun);color:var(--sun-ink);border-radius:14px;padding:8px 12px;font-weight:700;margin-bottom:10px;font-size:15px}
+.q.def{font-family:'Nunito',sans-serif;font-weight:800;font-size:19px}
+.fc{perspective:900px;cursor:pointer;margin:6px 0}
+.fci{position:relative;height:350px;transition:transform .5s;transform-style:preserve-3d}
+.fc.flip .fci{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:24px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:auto}
+.front{background:var(--grad);color:var(--pri-ink)}
+.front .word,.front .ipa{color:var(--pri-ink)}.front .word{font-size:48px}
+.back{background:var(--card);border:3px solid var(--pri);transform:rotateY(180deg)}
+.back .ex{text-align:left;width:100%}
+.big.sm{font-size:52px;margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <!-- ✏️ ĐỔI TÊN / LOGO WEB Ở ĐÂY -->
+    <div class="logo">🌿 MintyVocab</div>
+    <div class="pills" id="pills"></div>
+    <div class="stat" id="stat"></div>
+  </header>
+  <div class="tabs">
+    <button class="tab" id="t-learn" onclick="setTab('learn')">📖 Học từ</button>
+    <button class="tab" id="t-flash" onclick="setTab('flash')">🃏 Flashcard</button>
+    <button class="tab" id="t-prac" onclick="setTab('practice')">🎯 Luyện tập</button>
+  </div>
+  <div id="main"></div>
+</div>
+
+<script>
+/* ============================================================
+   ✏️ KHU VỰC NHẬP NỘI DUNG CHÍNH: DANH SÁCH CHỦ ĐỀ VÀ TỪ VỰNG
+   Cấu trúc: T = [ chủ đề 1, chủ đề 2, ... ]
+   Mỗi chủ đề = { name:'Tên', icon:'emoji', words:[ từ 1, từ 2, ... ] }
+   Mỗi từ có các trường:
+     w   = từ tiếng Anh
+     d   = định nghĩa ngắn bằng tiếng Anh (không bắt buộc, có thì hiện thêm)
+     p   = phiên âm
+     pos = loại từ (n, v, adj...)
+     vi  = nghĩa tiếng Việt
+     e   = emoji làm hình minh họa
+     c   = collocations: [['cụm tiếng Anh','nghĩa Việt'], ...]
+     r   = từ liên quan: [['từ','nghĩa Việt'], ...]
+     x   = câu ví dụ (PHẢI chứa đúng từ ở trường w)
+     xv  = nghĩa câu ví dụ
+   ============================================================ */
+const T=[
+{name:'Nha khoa',icon:'🦷',words:[
+{w:'cavity',d:'a hole in a tooth caused by decay',p:'/ˈkævəti/',pos:'n',vi:'sâu răng',e:'🦷',c:[['fill a cavity','trám răng sâu'],['get a cavity','bị sâu răng'],['prevent cavities','phòng ngừa sâu răng']],r:[['decay','sự mục, sâu'],['toothache','đau răng'],['filling','miếng trám']],x:'The dentist found a small cavity in my molar.',xv:'Nha sĩ tìm thấy một lỗ sâu nhỏ ở răng hàm của tôi.'},
+{w:'braces',d:'wires and brackets fixed to the teeth to straighten them',p:'/ˈbreɪsɪz/',pos:'n',vi:'niềng răng',e:'😁',c:[['wear braces','đeo niềng'],['get braces off','tháo niềng'],['metal braces','niềng mắc cài kim loại']],r:[['retainer','hàm duy trì'],['aligner','khay niềng trong suốt'],['orthodontist','bác sĩ chỉnh nha']],x:'She has worn braces for two years.',xv:'Cô ấy đeo niềng răng được hai năm rồi.'},
+{w:'floss',d:'to clean between the teeth with a thin thread; also, the thread itself',p:'/flɔːs/',pos:'v/n',vi:'chỉ nha khoa; xỉa răng',e:'🧵',c:[['floss daily','dùng chỉ nha khoa mỗi ngày'],['dental floss','chỉ nha khoa'],['floss between teeth','xỉa kẽ răng']],r:[['mouthwash','nước súc miệng'],['toothpaste','kem đánh răng'],['gum','nướu']],x:'Remember to floss before bed.',xv:'Nhớ dùng chỉ nha khoa trước khi đi ngủ nhé.'},
+{w:'checkup',d:'a general examination by a doctor or dentist to check your health',p:'/ˈtʃekʌp/',pos:'n',vi:'khám tổng quát',e:'🩺',c:[['a routine checkup','khám định kỳ'],['book a checkup','đặt lịch khám'],['a dental checkup','khám răng']],r:[['appointment','cuộc hẹn'],['X-ray','chụp X-quang'],['cleaning','lấy cao răng']],x:'I have a dental checkup every six months.',xv:'Tôi đi khám răng mỗi sáu tháng một lần.'}
+/* ✏️ THÊM TỪ MỚI VÀO CHỦ ĐỀ "NHA KHOA": thêm dấu phẩy sau dấu } ở dòng trên, rồi dán từ mới vào đây */
+]},
+{name:'Ôn thi',icon:'📚',words:[
+
+{w:'study',d:'to spend time learning about a subject',p:'/ˈstʌdi/',pos:'v',vi:'học',e:'📚',c:[['study for an exam','học để thi'],['study hard','học chăm chỉ'],['study regularly','học đều đặn']],r:[['learn','học'],['revise','ôn tập'],['practice','luyện tập']],x:'I studied for three hours but still felt unprepared.',xv:'Tôi học ba tiếng rồi mà vẫn cảm thấy chưa sẵn sàng.'},
+
+{w:'review',d:'to look again at something you have learned',p:'/rɪˈvjuː/',pos:'v',vi:'ôn lại',e:'🔄',c:[['review notes','xem lại ghi chú'],['review lessons','ôn lại bài học'],['review key concepts','ôn lại các khái niệm chính']],r:[['revise','ôn tập'],['revisit','xem lại'],['study','học']],x:'I spent the evening reviewing my notes from class.',xv:'Tôi dành cả buổi tối để xem lại ghi chú trên lớp.'},
+
+{w:'revision',d:'the process of studying before an exam',p:'/rɪˈvɪʒn/',pos:'n',vi:'việc ôn thi',e:'📝',c:[['do revision','ôn tập'],['revision schedule','lịch ôn thi'],['revision session','buổi ôn tập']],r:[['review','ôn lại'],['preparation','chuẩn bị'],['study','học tập']],x:'My revision plan completely fell apart this week.',xv:'Kế hoạch ôn thi của tôi hoàn toàn đổ vỡ trong tuần này.'},
+
+{w:'memorize',d:'to learn something so that you remember it exactly',p:'/ˈmeməraɪz/',pos:'v',vi:'ghi nhớ',e:'🧠',c:[['memorize vocabulary','học thuộc từ vựng'],['memorize formulas','ghi nhớ công thức'],['memorize information','ghi nhớ thông tin']],r:[['remember','nhớ'],['retain','ghi nhớ'],['learn','học']],x:'I can memorize formulas, but I struggle to apply them.',xv:'Tôi có thể ghi nhớ công thức nhưng lại khó áp dụng chúng.'},
+
+{w:'take notes',d:'to write down important information',p:'/teɪk noʊts/',pos:'v',vi:'ghi chép',e:'✍️',c:[['take notes in class','ghi chép trên lớp'],['detailed notes','ghi chú chi tiết'],['organized notes','ghi chú có hệ thống']],r:[['write down','ghi lại'],['record','ghi nhận'],['summarize','tóm tắt']],x:'Taking notes helps me stay focused during lessons.',xv:'Việc ghi chép giúp tôi tập trung hơn trong giờ học.'},
+
+{w:'practice',d:'to do something repeatedly to improve your skill',p:'/ˈpræktɪs/',pos:'v',vi:'luyện tập',e:'🎯',c:[['practice daily','luyện tập mỗi ngày'],['practice questions','luyện đề'],['practice regularly','luyện tập thường xuyên']],r:[['train','rèn luyện'],['exercise','thực hành'],['prepare','chuẩn bị']],x:'The more practice papers I do, the more confident I feel.',xv:'Tôi càng làm nhiều đề luyện thì càng tự tin hơn.'},
+
+{w:'mock exam',d:'a practice examination before a real test',p:'/mɒk ɪɡˈzæm/',pos:'n',vi:'thi thử',e:'🧪',c:[['take a mock exam','tham gia thi thử'],['mock exam results','kết quả thi thử'],['online mock exam','thi thử trực tuyến']],r:[['practice test','bài thi thử'],['assessment','đánh giá'],['exam','kỳ thi']],x:'My mock exam score was lower than expected.',xv:'Điểm thi thử của tôi thấp hơn mong đợi.'},
+
+{w:'score',d:'the number of points achieved in a test',p:'/skɔːr/',pos:'n',vi:'điểm số',e:'📈',c:[['achieve a score','đạt điểm'],['high score','điểm cao'],['improve your score','cải thiện điểm số']],r:[['grade','điểm'],['result','kết quả'],['mark','điểm số']],x:'I need at least a 7.0 score to apply for that program.',xv:'Tôi cần ít nhất 7.0 để đăng ký chương trình đó.'},
+
+{w:'cram',d:'to study intensively in a short period',p:'/kræm/',pos:'v',vi:'học nhồi nhét',e:'⏰',c:[['cram for an exam','học nhồi nhét để thi'],['cram overnight','học cấp tốc qua đêm'],['cram everything','nhồi toàn bộ kiến thức']],r:[['memorize','học thuộc'],['study','học'],['revise','ôn tập']],x:'I had to cram an entire semester of content in three days.',xv:'Tôi phải học nhồi cả học kỳ chỉ trong ba ngày.'},
+
+{w:'pull an all-nighter',d:'to stay awake all night studying or working',p:'/pʊl ən ɔːl ˈnaɪtər/',pos:'v',vi:'thức trắng đêm học bài',e:'🌙',c:[['pull an all-nighter before an exam','thức trắng đêm trước kỳ thi'],['avoid all-nighters','tránh thức trắng đêm'],['frequent all-nighters','thường xuyên thức khuya']],r:[['stay up late','thức khuya'],['cram','học nhồi'],['exhaustion','kiệt sức']],x:'I pulled an all-nighter before the chemistry exam.',xv:'Tôi đã thức trắng đêm trước kỳ thi hóa học.'},
+
+{w:'fall behind',d:'to fail to keep up with a schedule or group',p:'/fɔːl bɪˈhaɪnd/',pos:'v',vi:'tụt lại phía sau',e:'📉',c:[['fall behind in class','tụt lại trong lớp'],['fall behind schedule','chậm tiến độ'],['avoid falling behind','tránh tụt lại']],r:[['lag behind','tụt hậu'],['miss lessons','bỏ lỡ bài học'],['catch up','bắt kịp']],x:'I fell behind after missing a week of classes.',xv:'Tôi bị tụt lại sau khi nghỉ học một tuần.'},
+
+{w:'catch up',d:'to reach the same level as others after falling behind',p:'/kætʃ ʌp/',pos:'v',vi:'bắt kịp',e:'🏃',c:[['catch up on lessons','học bù bài'],['catch up with classmates','bắt kịp bạn bè'],['catch up quickly','bắt kịp nhanh chóng']],r:[['recover','phục hồi'],['improve','cải thiện'],['progress','tiến bộ']],x:'It took me two weeks to catch up with my classmates.',xv:'Tôi mất hai tuần để bắt kịp các bạn trong lớp.'},
+
+{w:'stay focused',d:'to keep your attention on a task',p:'/steɪ ˈfoʊkəst/',pos:'v',vi:'giữ tập trung',e:'🎯',c:[['stay focused on studying','tập trung học tập'],['stay focused despite distractions','giữ tập trung dù bị phân tâm'],['stay fully focused','tập trung hoàn toàn']],r:[['concentrate','tập trung'],['pay attention','chú ý'],['engage','tập trung tham gia']],x:'It is hard to stay focused with my phone beside me.',xv:'Thật khó để tập trung khi điện thoại ở ngay bên cạnh.'},
+
+{w:'distracted',d:'unable to concentrate because something takes your attention away',p:'/dɪˈstræktɪd/',pos:'adj',vi:'mất tập trung',e:'📱',c:[['feel distracted','cảm thấy mất tập trung'],['easily distracted','dễ bị phân tâm'],['get distracted by social media','bị mạng xã hội làm phân tâm']],r:[['unfocused','thiếu tập trung'],['absent-minded','lơ đãng'],['inattentive','không chú ý']],x:'I keep getting distracted by social media.',xv:'Tôi liên tục bị mạng xã hội làm phân tâm.'},
+
+{w:'deadline',d:'the latest time something must be completed',p:'/ˈdedlaɪn/',pos:'n',vi:'hạn chót',e:'⏳',c:[['meet a deadline','đúng hạn'],['miss a deadline','trễ hạn'],['tight deadline','hạn gấp']],r:[['due date','ngày đến hạn'],['schedule','lịch trình'],['urgency','sự gấp rút']],x:'The deadline is tomorrow and I have barely started.',xv:'Hạn nộp là ngày mai mà tôi gần như chưa bắt đầu.'},
+
+{w:'time management',d:'the ability to use your time effectively',p:'/taɪm ˈmænɪdʒmənt/',pos:'n',vi:'quản lý thời gian',e:'⌚',c:[['good time management','quản lý thời gian tốt'],['time management skills','kỹ năng quản lý thời gian'],['improve time management','cải thiện quản lý thời gian']],r:[['planning','lập kế hoạch'],['organization','sự tổ chức'],['schedule','lịch trình']],x:'Good time management is more important than studying longer.',xv:'Quản lý thời gian tốt còn quan trọng hơn học nhiều giờ.'},
+
+{w:'procrastinate',d:'to delay doing something important',p:'/prəˈkræstɪneɪt/',pos:'v',vi:'trì hoãn',e:'😅',c:[['procrastinate on studying','trì hoãn việc học'],['stop procrastinating','ngừng trì hoãn'],['habit of procrastination','thói quen trì hoãn']],r:[['delay','trì hoãn'],['postpone','hoãn lại'],['avoid','né tránh']],x:'I always procrastinate until the pressure becomes unbearable.',xv:'Tôi luôn trì hoãn cho đến khi áp lực trở nên quá sức chịu đựng.'},
+
+{w:'overwhelmed',d:'feeling unable to cope because there is too much to do',p:'/ˌoʊvərˈwelmd/',pos:'adj',vi:'quá tải',e:'🌊',c:[['feel overwhelmed','cảm thấy quá tải'],['overwhelmed by workload','quá tải vì khối lượng học tập'],['emotionally overwhelmed','quá tải cảm xúc']],r:[['stressed','căng thẳng'],['anxious','lo lắng'],['exhausted','kiệt sức']],x:'I felt overwhelmed by the amount of material I needed to review.',xv:'Tôi cảm thấy quá tải trước lượng kiến thức cần ôn.'},
+
+{w:'burnout',d:'extreme exhaustion caused by prolonged stress',p:'/ˈbɜːrnaʊt/',pos:'n',vi:'kiệt sức vì học tập',e:'🔥',c:[['academic burnout','kiệt sức học tập'],['suffer from burnout','bị kiệt sức'],['prevent burnout','tránh kiệt sức']],r:[['fatigue','mệt mỏi'],['stress','căng thẳng'],['exhaustion','kiệt quệ']],x:'After months of nonstop studying, I experienced burnout.',xv:'Sau nhiều tháng học liên tục, tôi rơi vào trạng thái kiệt sức.'},
+
+{w:'exam anxiety',d:'intense worry before or during an exam',p:'/ɪɡˈzæm æŋˈzaɪəti/',pos:'n',vi:'lo âu thi cử',e:'😰',c:[['suffer from exam anxiety','bị lo âu thi cử'],['reduce exam anxiety','giảm lo âu thi cử'],['severe exam anxiety','lo âu nghiêm trọng']],r:[['stress','căng thẳng'],['nervousness','hồi hộp'],['worry','lo lắng']],x:'I could not sleep last night because of my exam anxiety.',xv:'Tôi không thể ngủ tối qua vì lo âu thi cử.'},
+
+{w:'self-discipline',d:'the ability to control yourself and work consistently',p:'/ˌself ˈdɪsəplɪn/',pos:'n',vi:'tính kỷ luật',e:'📅',c:[['build self-discipline','rèn tính kỷ luật'],['strong self-discipline','kỷ luật cao'],['lack self-discipline','thiếu kỷ luật']],r:[['commitment','cam kết'],['focus','sự tập trung'],['consistency','sự đều đặn']],x:'Self-discipline helped me stick to my study plan.',xv:'Tính kỷ luật giúp tôi bám sát kế hoạch học tập.'},
+
+{w:'motivation',d:'the reason or desire to do something',p:'/ˌmoʊtɪˈveɪʃn/',pos:'n',vi:'động lực',e:'🚀',c:[['stay motivated','duy trì động lực'],['lose motivation','mất động lực'],['boost motivation','tăng động lực']],r:[['drive','động lực'],['ambition','tham vọng'],['determination','quyết tâm']],x:'I lost motivation after getting a disappointing score.',xv:'Tôi mất động lực sau khi nhận điểm số đáng thất vọng.'},
+
+{w:'consistency',d:'the quality of doing something regularly',p:'/kənˈsɪstənsi/',pos:'n',vi:'sự đều đặn',e:'📈',c:[['study with consistency','học đều đặn'],['maintain consistency','duy trì sự đều đặn'],['consistency matters','sự đều đặn rất quan trọng']],r:[['discipline','kỷ luật'],['routine','thói quen'],['commitment','cam kết']],x:'Consistency matters more than studying ten hours in one day.',xv:'Sự đều đặn quan trọng hơn việc học mười tiếng trong một ngày.'},
+
+{w:'productive',d:'achieving a lot of useful work',p:'/prəˈdʌktɪv/',pos:'adj',vi:'hiệu quả',e:'⚡',c:[['productive study session','buổi học hiệu quả'],['highly productive','rất hiệu quả'],['stay productive','duy trì hiệu quả']],r:[['efficient','hiệu suất cao'],['effective','hiệu quả'],['focused','tập trung']],x:'Today was surprisingly productive because I followed my schedule.',xv:'Hôm nay hiệu quả ngoài mong đợi vì tôi làm theo lịch trình.'},
+
+{w:'doomscrolling',d:'spending too much time scrolling through social media',p:'/ˈduːmˌskroʊlɪŋ/',pos:'n',vi:'lướt mạng vô thức',e:'📱',c:[['doomscroll for hours','lướt mạng hàng giờ'],['avoid doomscrolling','tránh lướt mạng vô thức'],['doomscrolling habit','thói quen lướt mạng']],r:[['distraction','sự phân tâm'],['social media','mạng xã hội'],['procrastination','sự trì hoãn']],x:'I wasted two hours doomscrolling instead of studying.',xv:'Tôi lãng phí hai tiếng lướt mạng vô thức thay vì học.'},
+
+{w:'study slump',d:'a period when you lose motivation to study',p:'/ˈstʌdi slʌmp/',pos:'n',vi:'giai đoạn chững lại trong việc học',e:'📉',c:[['go through a study slump','trải qua giai đoạn chững lại'],['get out of a study slump','thoát khỏi tình trạng chững lại'],['deep study slump','giai đoạn mất động lực nghiêm trọng']],r:[['burnout','kiệt sức'],['demotivation','mất động lực'],['fatigue','mệt mỏi']],x:'I am going through a study slump and cannot focus on anything.',xv:'Tôi đang trải qua giai đoạn chững lại trong việc học và không thể tập trung.'},
+
+{w:'comparison trap',d:'constantly comparing yourself to others in an unhealthy way',p:'/kəmˈpærɪsn træp/',pos:'n',vi:'cái bẫy so sánh bản thân',e:'🪤',c:[['fall into the comparison trap','rơi vào bẫy so sánh'],['avoid the comparison trap','tránh bẫy so sánh'],['social media comparison trap','bẫy so sánh trên mạng xã hội']],r:[['peer pressure','áp lực đồng trang lứa'],['self-doubt','nghi ngờ bản thân'],['insecurity','thiếu tự tin']],x:'Seeing other students succeed pushed me into the comparison trap.',xv:'Nhìn thấy người khác thành công khiến tôi rơi vào cái bẫy so sánh.'},
+
+{w:'imposter syndrome',d:'the feeling that your success is undeserved',p:'/ɪmˈpɒstər ˌsɪndroʊm/',pos:'n',vi:'hội chứng kẻ mạo danh',e:'🎭',c:[['experience imposter syndrome','gặp hội chứng kẻ mạo danh'],['academic imposter syndrome','hội chứng trong học tập'],['overcome imposter syndrome','vượt qua hội chứng']],r:[['self-doubt','nghi ngờ bản thân'],['insecurity','thiếu tự tin'],['anxiety','lo âu']],x:'Even after getting good grades, I still struggle with imposter syndrome.',xv:'Ngay cả khi đạt điểm cao, tôi vẫn vật lộn với hội chứng kẻ mạo danh.'},
+
+{w:'growth mindset',d:'the belief that skills can improve through effort',p:'/ɡroʊθ ˈmaɪndset/',pos:'n',vi:'tư duy phát triển',e:'🌱',c:[['develop a growth mindset','phát triển tư duy phát triển'],['growth mindset approach','cách tiếp cận tích cực'],['adopt a growth mindset','xây dựng tư duy phát triển']],r:[['self-improvement','phát triển bản thân'],['learning','học hỏi'],['resilience','sự bền bỉ']],x:'A growth mindset helped me see mistakes as learning opportunities.',xv:'Tư duy phát triển giúp tôi xem sai lầm là cơ hội để học hỏi.'}
+
+]},
+
+
+{name:'Chiến thuật làm bài',icon:'🎯',words:[
+{w:'read carefully',d:'to read something with a lot of attention',p:'/riːd ˈkerfəli/',pos:'v',vi:'đọc kỹ',e:'👀',c:[['read carefully before answering','đọc kỹ trước khi trả lời'],['read the question carefully','đọc kỹ câu hỏi'],['carefully read the instructions','đọc kỹ hướng dẫn']],r:[['examine','xem xét'],['analyze','phân tích'],['focus','tập trung']],x:'Always read the question carefully before choosing an answer.',xv:'Luôn đọc kỹ câu hỏi trước khi chọn đáp án.'},
+
+{w:'highlight',d:'to mark important information',p:'/ˈhaɪlaɪt/',pos:'v',vi:'đánh dấu ý quan trọng',e:'🖍️',c:[['highlight keywords','đánh dấu từ khóa'],['highlight important details','đánh dấu chi tiết quan trọng'],['highlight evidence','đánh dấu dữ kiện']],r:[['underline','gạch chân'],['mark','đánh dấu'],['note','ghi chú']],x:'I highlighted all the keywords in the reading passage.',xv:'Tôi đánh dấu tất cả từ khóa trong bài đọc.'},
+
+{w:'keyword',d:'an important word that helps understand a question',p:'/ˈkiːwɜːrd/',pos:'n',vi:'từ khóa',e:'🔑',c:[['identify keywords','xác định từ khóa'],['circle keywords','khoanh từ khóa'],['search for keywords','tìm từ khóa']],r:[['clue','manh mối'],['term','thuật ngữ'],['hint','gợi ý']],x:'The keyword helped me find the correct answer quickly.',xv:'Từ khóa giúp tôi tìm đúng đáp án nhanh hơn.'},
+
+{w:'manage your time',d:'to use your time effectively',p:'/ˈmænɪdʒ jɔːr taɪm/',pos:'v',vi:'quản lý thời gian',e:'⏰',c:[['manage your time wisely','quản lý thời gian hợp lý'],['time management skills','kỹ năng quản lý thời gian'],['poor time management','quản lý thời gian kém']],r:[['schedule','lịch trình'],['deadline','hạn chót'],['planning','lập kế hoạch']],x:'Good candidates know how to manage their time during exams.',xv:'Những thí sinh giỏi biết cách quản lý thời gian khi làm bài.'},
+
+{w:'skim',d:'to read quickly to get the main idea',p:'/skɪm/',pos:'v',vi:'đọc lướt',e:'⚡',c:[['skim the text','đọc lướt văn bản'],['skim for the main idea','đọc lấy ý chính'],['skim quickly','đọc lướt nhanh']],r:[['scan','đọc quét'],['read','đọc'],['overview','tổng quan']],x:'I skimmed the article before answering the questions.',xv:'Tôi đọc lướt bài viết trước khi trả lời câu hỏi.'},
+
+{w:'scan',d:'to look for specific information quickly',p:'/skæn/',pos:'v',vi:'đọc quét tìm thông tin',e:'🔍',c:[['scan for details','quét tìm chi tiết'],['scan for names','tìm tên riêng'],['scan the passage','đọc quét bài đọc']],r:[['skim','đọc lướt'],['search','tìm kiếm'],['locate','xác định vị trí']],x:'I scanned the passage for dates and numbers.',xv:'Tôi quét bài đọc để tìm ngày tháng và số liệu.'},
+
+{w:'eliminate',d:'to remove unlikely answers',p:'/ɪˈlɪmɪneɪt/',pos:'v',vi:'loại đáp án',e:'❎',c:[['eliminate wrong answers','loại đáp án sai'],['eliminate options','loại phương án'],['process of elimination','phương pháp loại trừ']],r:[['reject','loại bỏ'],['exclude','loại trừ'],['rule out','gạch bỏ']],x:'I eliminated two wrong answers before making a choice.',xv:'Tôi loại hai đáp án sai trước khi chọn.'},
+
+{w:'educated guess',d:'a guess based on some knowledge',p:'/ˌedʒukeɪtɪd ɡes/',pos:'n',vi:'phỏng đoán có cơ sở',e:'🤔',c:[['make an educated guess','đưa ra phỏng đoán có cơ sở'],['educated guess strategy','chiến thuật suy đoán'],['best educated guess','phỏng đoán hợp lý nhất']],r:[['estimate','ước lượng'],['prediction','dự đoán'],['assumption','giả định']],x:'I was not sure, so I made an educated guess.',xv:'Tôi không chắc nên đã đưa ra một phỏng đoán có cơ sở.'},
+
+{w:'double-check',d:'to check again for mistakes',p:'/ˌdʌbl ˈtʃek/',pos:'v',vi:'kiểm tra lại',e:'✅',c:[['double-check answers','kiểm tra lại đáp án'],['double-check calculations','kiểm tra phép tính'],['double-check spelling','kiểm tra chính tả']],r:[['review','xem lại'],['verify','xác minh'],['inspect','kiểm tra']],x:'I always double-check my answers before submission.',xv:'Tôi luôn kiểm tra lại đáp án trước khi nộp bài.'},
+
+{w:'pace yourself',d:'to work at a steady speed',p:'/peɪs jɔːrˈself/',pos:'v',vi:'giữ nhịp độ làm bài',e:'🏃',c:[['pace yourself throughout the exam','giữ nhịp độ xuyên suốt bài thi'],['proper pacing','phân bổ tốc độ hợp lý'],['maintain your pace','duy trì nhịp độ']],r:[['timing','căn thời gian'],['endurance','sự bền bỉ'],['balance','sự cân bằng']],x:'Do not spend too much time on one question. Pace yourself.',xv:'Đừng dành quá nhiều thời gian cho một câu hỏi. Hãy giữ nhịp độ làm bài.'},
+
+{w:'prioritize',d:'to deal with the most important things first',p:'/praɪˈɔːrətaɪz/',pos:'v',vi:'ưu tiên',e:'🎯',c:[['prioritize easy questions','ưu tiên câu dễ'],['prioritize tasks','ưu tiên nhiệm vụ'],['prioritize effectively','ưu tiên hiệu quả']],r:[['focus on','tập trung vào'],['rank','xếp hạng'],['organize','sắp xếp']],x:'I prioritized the easier questions first.',xv:'Tôi ưu tiên làm những câu dễ trước.'},
+
+{w:'second-guess',d:'to doubt your original answer',p:'/ˌsekənd ˈɡes/',pos:'v',vi:'nghi ngờ đáp án ban đầu',e:'😵',c:[['second-guess yourself','tự nghi ngờ bản thân'],['avoid second-guessing','tránh đổi đáp án liên tục'],['keep second-guessing','liên tục nghi ngờ']],r:[['doubt','nghi ngờ'],['hesitate','do dự'],['uncertainty','sự không chắc chắn']],x:'Many students lose marks because they keep second-guessing themselves.',xv:'Nhiều học sinh mất điểm vì liên tục nghi ngờ bản thân.'},
+
+{w:'overthink',d:'to think about something too much',p:'/ˌoʊvərˈθɪŋk/',pos:'v',vi:'suy nghĩ quá mức',e:'🌀',c:[['overthink a question','suy nghĩ quá nhiều về một câu hỏi'],['stop overthinking','ngừng suy diễn'],['overthink simple questions','phức tạp hóa câu hỏi đơn giản']],r:[['analyze','phân tích'],['worry','lo lắng'],['hesitate','chần chừ']],x:'The answer was simple, but I overthought it.',xv:'Đáp án rất đơn giản nhưng tôi lại nghĩ quá nhiều.'},
+
+{w:'trust your instincts',d:'to rely on your first judgment',p:'/trʌst jɔːr ˈɪnstɪŋkts/',pos:'v',vi:'tin vào trực giác của mình',e:'🧠',c:[['trust your instincts','tin vào trực giác'],['follow your instincts','làm theo trực giác'],['instinctive answer','câu trả lời theo trực giác']],r:[['confidence','sự tự tin'],['judgment','phán đoán'],['intuition','trực giác']],x:'If you are prepared, trust your instincts.',xv:'Nếu đã chuẩn bị kỹ, hãy tin vào trực giác của mình.'}
+
+]},
+
+{name:'Tâm lý mùa thi',icon:'😰',words:[
+
+{w:'nervous',d:'feeling worried or slightly afraid about something',p:'/ˈnɜːrvəs/',pos:'adj',vi:'hồi hộp, lo lắng',e:'😬',c:[['feel nervous','cảm thấy hồi hộp'],['extremely nervous','cực kỳ hồi hộp'],['nervous before an exam','hồi hộp trước kỳ thi']],r:[['worried','lo lắng'],['anxious','lo âu'],['tense','căng thẳng']],x:'I felt nervous as soon as I entered the exam room.',xv:'Tôi cảm thấy hồi hộp ngay khi bước vào phòng thi.'},
+
+{w:'stress',d:'mental pressure caused by difficult situations',p:'/stres/',pos:'n',vi:'căng thẳng',e:'😖',c:[['exam stress','căng thẳng thi cử'],['reduce stress','giảm căng thẳng'],['cope with stress','đối phó với căng thẳng']],r:[['pressure','áp lực'],['tension','sự căng thẳng'],['anxiety','lo âu']],x:'Exam stress affects my sleep every semester.',xv:'Căng thẳng thi cử ảnh hưởng đến giấc ngủ của tôi mỗi học kỳ.'},
+
+{w:'pressure',d:'the feeling that you must succeed',p:'/ˈpreʃər/',pos:'n',vi:'áp lực',e:'💨',c:[['academic pressure','áp lực học tập'],['parental pressure','áp lực từ cha mẹ'],['feel pressure','cảm thấy áp lực']],r:[['expectation','kỳ vọng'],['stress','căng thẳng'],['burden','gánh nặng']],x:'Many students feel pressure to get top grades.',xv:'Nhiều học sinh cảm thấy áp lực phải đạt điểm cao.'},
+
+{w:'confidence',d:'belief in your own abilities',p:'/ˈkɒnfɪdəns/',pos:'n',vi:'sự tự tin',e:'💪',c:[['build confidence','xây dựng sự tự tin'],['lose confidence','mất tự tin'],['boost confidence','tăng tự tin']],r:[['belief','niềm tin'],['self-esteem','lòng tự trọng'],['assurance','sự tự tin']],x:'Doing mock tests helped build my confidence.',xv:'Làm đề thi thử giúp tôi xây dựng sự tự tin.'},
+
+{w:'panic',d:'a sudden feeling of fear that makes it hard to think',p:'/ˈpænɪk/',pos:'v/n',vi:'hoảng loạn',e:'😱',c:[['panic during an exam','hoảng loạn trong lúc thi'],['panic attack','cơn hoảng loạn'],['start to panic','bắt đầu hoảng']],r:[['fear','sợ hãi'],['anxiety','lo âu'],['confusion','hoang mang']],x:'I panicked when I saw the first question.',xv:'Tôi hoảng loạn khi nhìn thấy câu hỏi đầu tiên.'},
+
+{w:'exam anxiety',d:'strong feelings of worry related to exams',p:'/ɪɡˈzæm æŋˈzaɪəti/',pos:'n',vi:'lo âu thi cử',e:'😰',c:[['suffer from exam anxiety','bị lo âu thi cử'],['reduce exam anxiety','giảm lo âu'],['severe exam anxiety','lo âu nghiêm trọng']],r:[['stress','căng thẳng'],['nervousness','hồi hộp'],['fear','nỗi sợ']],x:'My exam anxiety gets worse the night before the test.',xv:'Lo âu thi cử của tôi tệ hơn vào đêm trước kỳ thi.'},
+
+{w:'overwhelmed',d:'feeling unable to handle everything',p:'/ˌoʊvərˈwelmd/',pos:'adj',vi:'quá tải',e:'🌊',c:[['feel overwhelmed','cảm thấy quá tải'],['overwhelmed by workload','quá tải vì bài vở'],['emotionally overwhelmed','quá tải cảm xúc']],r:[['stressed','căng thẳng'],['exhausted','kiệt sức'],['anxious','lo âu']],x:'I felt overwhelmed by the number of topics I had to review.',xv:'Tôi cảm thấy quá tải trước số lượng chủ đề cần ôn tập.'},
+
+{w:'self-doubt',d:'a lack of confidence in yourself',p:'/ˌself ˈdaʊt/',pos:'n',vi:'nghi ngờ bản thân',e:'🤔',c:[['experience self-doubt','nghi ngờ bản thân'],['overcome self-doubt','vượt qua sự tự ti'],['constant self-doubt','sự nghi ngờ kéo dài']],r:[['insecurity','thiếu tự tin'],['uncertainty','không chắc chắn'],['imposter syndrome','hội chứng kẻ mạo danh']],x:'Self-doubt often appears before important exams.',xv:'Sự nghi ngờ bản thân thường xuất hiện trước các kỳ thi quan trọng.'},
+
+{w:'procrastinate',d:'to delay doing something important',p:'/prəˈkræstɪneɪt/',pos:'v',vi:'trì hoãn',e:'😅',c:[['procrastinate on studying','trì hoãn việc học'],['stop procrastinating','ngừng trì hoãn'],['habit of procrastination','thói quen trì hoãn']],r:[['delay','trì hoãn'],['avoid','né tránh'],['postpone','hoãn lại']],x:'I procrastinated all week and now the exam is tomorrow.',xv:'Tôi trì hoãn cả tuần và giờ ngày mai đã thi rồi.'},
+
+{w:'burnout',d:'extreme tiredness caused by long periods of stress',p:'/ˈbɜːrnaʊt/',pos:'n',vi:'kiệt sức',e:'🔥',c:[['academic burnout','kiệt sức vì học'],['suffer from burnout','bị kiệt sức'],['prevent burnout','ngăn ngừa kiệt sức']],r:[['fatigue','mệt mỏi'],['exhaustion','kiệt quệ'],['stress','căng thẳng']],x:'Months of studying without breaks led to burnout.',xv:'Nhiều tháng học liên tục không nghỉ đã dẫn đến kiệt sức.'},
+
+{w:'study slump',d:'a period when you lose motivation to study',p:'/ˈstʌdi slʌmp/',pos:'n',vi:'giai đoạn chững lại trong học tập',e:'📉',c:[['go through a study slump','trải qua giai đoạn chững lại'],['get out of a slump','thoát khỏi trạng thái trì trệ'],['study slump period','giai đoạn mất động lực']],r:[['burnout','kiệt sức'],['demotivation','mất động lực'],['fatigue','mệt mỏi']],x:'I am in a study slump and cannot focus lately.',xv:'Dạo này tôi đang chững lại trong việc học và không thể tập trung.'},
+
+{w:'comparison trap',d:'constantly comparing yourself with others',p:'/kəmˈpærɪsn træp/',pos:'n',vi:'bẫy so sánh bản thân',e:'📱',c:[['fall into the comparison trap','rơi vào bẫy so sánh'],['avoid the comparison trap','tránh bẫy so sánh'],['social media comparison trap','bẫy so sánh trên mạng xã hội']],r:[['peer pressure','áp lực bạn bè'],['self-doubt','nghi ngờ bản thân'],['insecurity','thiếu tự tin']],x:'Seeing everyone post their scores pushed me into the comparison trap.',xv:'Việc thấy mọi người đăng điểm số khiến tôi rơi vào bẫy so sánh.'},
+
+{w:'peer pressure',d:'pressure from people of your age group',p:'/pɪr ˈpreʃər/',pos:'n',vi:'áp lực đồng trang lứa',e:'👥',c:[['face peer pressure','đối mặt áp lực bạn bè'],['academic peer pressure','áp lực học tập từ bạn bè'],['resist peer pressure','chống lại áp lực']],r:[['comparison','so sánh'],['expectation','kỳ vọng'],['competition','cạnh tranh']],x:'Peer pressure can make students feel inadequate.',xv:'Áp lực đồng trang lứa có thể khiến học sinh cảm thấy mình kém cỏi.'},
+
+{w:'imposter syndrome',d:'feeling that you do not deserve your achievements',p:'/ɪmˈpɒstər ˌsɪndroʊm/',pos:'n',vi:'hội chứng kẻ mạo danh',e:'🎭',c:[['experience imposter syndrome','trải qua hội chứng kẻ mạo danh'],['academic imposter syndrome','hội chứng trong học tập'],['overcome imposter syndrome','vượt qua hội chứng']],r:[['self-doubt','nghi ngờ bản thân'],['insecurity','thiếu tự tin'],['anxiety','lo âu']],x:'Even top students can struggle with imposter syndrome.',xv:'Ngay cả những học sinh giỏi nhất cũng có thể gặp hội chứng kẻ mạo danh.'},
+
+{w:'mental resilience',d:'the ability to recover from difficulties',p:'/ˈmentl rɪˈzɪliəns/',pos:'n',vi:'sự bền bỉ tinh thần',e:'🌱',c:[['build mental resilience','rèn luyện sự bền bỉ tinh thần'],['strong mental resilience','tinh thần vững vàng'],['develop resilience','phát triển khả năng phục hồi']],r:[['perseverance','sự kiên trì'],['strength','sức mạnh tinh thần'],['adaptability','khả năng thích nghi']],x:'Mental resilience helps you bounce back after a bad test.',xv:'Sự bền bỉ tinh thần giúp bạn đứng dậy sau một bài thi không tốt.'},
+
+{w:'growth mindset',d:'the belief that abilities can improve through effort',p:'/ɡroʊθ ˈmaɪndset/',pos:'n',vi:'tư duy phát triển',e:'🧠',c:[['develop a growth mindset','phát triển tư duy phát triển'],['growth mindset approach','cách tiếp cận tích cực'],['adopt a growth mindset','xây dựng tư duy phát triển']],r:[['self-improvement','phát triển bản thân'],['learning','học hỏi'],['resilience','sự bền bỉ']],x:'A growth mindset helped me see mistakes as opportunities to learn.',xv:'Tư duy phát triển giúp tôi xem sai lầm là cơ hội để học hỏi.'}
+
+]},
+
+{name:'Gian lận thi cử',icon:'🚫',words:[
+
+{w:'cheat',d:'to behave dishonestly in an examination',p:'/tʃiːt/',pos:'v',vi:'gian lận thi cử',e:'🚫',c:[['cheat on a test','gian lận trong bài kiểm tra'],['cheat in an exam','gian lận trong kỳ thi'],['get caught cheating','bị bắt gian lận']],r:[['dishonesty','sự không trung thực'],['misconduct','hành vi sai phạm'],['deception','sự lừa dối']],x:'Several students were caught cheating during the exam.',xv:'Một số học sinh đã bị bắt quả tang gian lận trong kỳ thi.'},
+
+{w:'copy',d:'to use someone else’s answers as your own',p:'/ˈkɒpi/',pos:'v',vi:'chép bài',e:'📄',c:[['copy answers','chép đáp án'],['copy from someone','chép bài của ai'],['copy during an exam','chép bài trong lúc thi']],r:[['imitate','bắt chước'],['cheat','gian lận'],['plagiarize','đạo văn']],x:'He copied answers from the student sitting next to him.',xv:'Anh ấy chép đáp án từ học sinh ngồi bên cạnh.'},
+
+{w:'cheat sheet',d:'hidden notes used dishonestly in an exam',p:'/ˈtʃiːt ʃiːt/',pos:'n',vi:'phao thi',e:'📑',c:[['bring a cheat sheet','mang phao thi'],['hide a cheat sheet','giấu phao thi'],['find a cheat sheet','phát hiện phao thi']],r:[['notes','ghi chú'],['cheating','gian lận'],['misconduct','vi phạm']],x:'The invigilator found a cheat sheet inside his pencil case.',xv:'Giám thị phát hiện một tờ phao trong hộp bút của anh ấy.'},
+
+{w:'whisper',d:'to speak very quietly to someone',p:'/ˈwɪspər/',pos:'v',vi:'thì thầm trao đổi bài',e:'🗣️',c:[['whisper answers','thì thầm đáp án'],['whisper to a classmate','thì thầm với bạn cùng lớp'],['stop whispering','ngừng thì thầm']],r:[['talk','nói chuyện'],['communicate','giao tiếp'],['signal','ra hiệu']],x:'Two students were warned for whispering during the test.',xv:'Hai học sinh bị nhắc nhở vì thì thầm trong khi làm bài.'},
+
+{w:'unauthorized materials',d:'materials not allowed during an examination',p:'/ʌnˈɔːθəraɪzd məˈtɪriəlz/',pos:'n',vi:'tài liệu không được phép',e:'📚',c:[['bring unauthorized materials','mang tài liệu trái phép'],['possess unauthorized materials','sở hữu tài liệu cấm'],['unauthorized materials policy','quy định về tài liệu cấm']],r:[['notes','ghi chú'],['textbook','sách giáo khoa'],['cheat sheet','phao thi']],x:'Candidates must not bring unauthorized materials into the exam room.',xv:'Thí sinh không được mang tài liệu trái phép vào phòng thi.'},
+
+{w:'plagiarism',d:'using someone else’s work without giving credit',p:'/ˈpleɪdʒərɪzəm/',pos:'n',vi:'đạo văn',e:'📄',c:[['commit plagiarism','đạo văn'],['plagiarism detection','phát hiện đạo văn'],['avoid plagiarism','tránh đạo văn']],r:[['copying','sao chép'],['dishonesty','không trung thực'],['citation','trích dẫn']],x:'The essay was rejected because of plagiarism.',xv:'Bài luận bị từ chối vì đạo văn.'},
+
+{w:'academic dishonesty',d:'unethical behavior in academic settings',p:'/ˌækəˈdemɪk dɪsˈɒnəsti/',pos:'n',vi:'hành vi thiếu trung thực học thuật',e:'⚠️',c:[['academic dishonesty case','vụ việc gian lận học thuật'],['prevent academic dishonesty','ngăn chặn gian lận'],['academic dishonesty policy','quy định chống gian lận']],r:[['cheating','gian lận'],['plagiarism','đạo văn'],['misconduct','sai phạm']],x:'The university has strict rules against academic dishonesty.',xv:'Trường đại học có các quy định nghiêm ngặt chống lại hành vi thiếu trung thực học thuật.'},
+
+{w:'academic pressure',d:'pressure to achieve high academic results',p:'/ˌækəˈdemɪk ˈpreʃər/',pos:'n',vi:'áp lực học tập',e:'📚',c:[['academic pressure from parents','áp lực từ phụ huynh'],['handle academic pressure','đối phó áp lực học tập'],['high academic pressure','áp lực học tập lớn']],r:[['stress','căng thẳng'],['expectation','kỳ vọng'],['competition','cạnh tranh']],x:'Academic pressure can push some students toward cheating.',xv:'Áp lực học tập có thể đẩy một số học sinh đến việc gian lận.'},
+
+{w:'peer pressure',d:'influence from people of the same age group',p:'/pɪr ˈpreʃər/',pos:'n',vi:'áp lực bạn bè đồng trang lứa',e:'👥',c:[['face peer pressure','đối mặt áp lực bạn bè'],['negative peer pressure','áp lực tiêu cực'],['resist peer pressure','chống lại áp lực']],r:[['comparison','so sánh'],['competition','cạnh tranh'],['expectation','kỳ vọng']],x:'Peer pressure sometimes encourages students to make poor decisions.',xv:'Áp lực bạn bè đôi khi khiến học sinh đưa ra những quyết định sai lầm.'},
+
+{w:'fear of failure',d:'an intense worry about failing',p:'/fɪr əv ˈfeɪljər/',pos:'n',vi:'nỗi sợ thất bại',e:'😨',c:[['overcome fear of failure','vượt qua nỗi sợ thất bại'],['fear of failure mindset','tâm lý sợ thất bại'],['driven by fear of failure','bị chi phối bởi nỗi sợ thất bại']],r:[['anxiety','lo âu'],['stress','căng thẳng'],['insecurity','thiếu tự tin']],x:'Fear of failure often causes students to panic before exams.',xv:'Nỗi sợ thất bại thường khiến học sinh hoảng loạn trước kỳ thi.'},
+
+{w:'integrity',d:'the quality of being honest and having strong moral principles',p:'/ɪnˈteɡrəti/',pos:'n',vi:'sự chính trực',e:'🤝',c:[['academic integrity','chính trực học thuật'],['act with integrity','hành động chính trực'],['integrity matters','sự chính trực rất quan trọng']],r:[['honesty','trung thực'],['ethics','đạo đức'],['fairness','công bằng']],x:'Integrity is more important than getting a perfect score.',xv:'Sự chính trực quan trọng hơn việc đạt điểm tuyệt đối.'},
+
+{w:'fairness',d:'the quality of treating people equally and justly',p:'/ˈfernəs/',pos:'n',vi:'sự công bằng',e:'⚖️',c:[['promote fairness','thúc đẩy sự công bằng'],['maintain fairness','duy trì công bằng'],['fairness in exams','sự công bằng trong thi cử']],r:[['justice','công lý'],['equality','bình đẳng'],['integrity','chính trực']],x:'Exam rules exist to ensure fairness for everyone.',xv:'Các quy định thi cử tồn tại để đảm bảo công bằng cho mọi người.'},
+
+{w:'accountability',d:'the willingness to accept responsibility for your actions',p:'/əˌkaʊntəˈbɪləti/',pos:'n',vi:'tinh thần chịu trách nhiệm',e:'🧾',c:[['take accountability','chịu trách nhiệm'],['personal accountability','trách nhiệm cá nhân'],['promote accountability','khuyến khích trách nhiệm']],r:[['responsibility','trách nhiệm'],['ownership','sự tự chịu trách nhiệm'],['integrity','chính trực']],x:'Students should learn accountability instead of looking for shortcuts.',xv:'Học sinh nên học cách chịu trách nhiệm thay vì tìm đường tắt.'},
+
+{w:'ethical decision',d:'a choice based on moral principles',p:'/ˈeθɪkl dɪˈsɪʒn/',pos:'n',vi:'quyết định đúng đắn về mặt đạo đức',e:'🧠',c:[['make an ethical decision','đưa ra quyết định đúng đắn'],['ethical behavior','hành vi có đạo đức'],['ethical standards','chuẩn mực đạo đức']],r:[['integrity','chính trực'],['honesty','trung thực'],['responsibility','trách nhiệm']],x:'Refusing to cheat was an ethical decision.',xv:'Từ chối gian lận là một quyết định đúng đắn về mặt đạo đức.'},
+{w:'peek',d:'to secretly look at someone else’s work',p:'/piːk/',pos:'v',vi:'liếc trộm bài người khác',e:'👀',c:[['peek at answers','liếc đáp án'],['peek at someone’s paper','liếc bài người khác'],['secretly peek','lén nhìn']],r:[['glance','liếc nhìn'],['copy','chép bài'],['spy','nhìn trộm']],x:'The invigilator noticed him peeking at another student’s paper.',xv:'Giám thị nhận thấy anh ấy đang liếc bài của một học sinh khác.'},
+
+{w:'exchange answers',d:'to secretly share answers during an exam',p:'/ɪksˈtʃeɪndʒ ˈænsərz/',pos:'v',vi:'trao đổi đáp án',e:'🔄',c:[['exchange answers during an exam','trao đổi đáp án khi thi'],['caught exchanging answers','bị bắt trao đổi đáp án'],['secretly exchange answers','lén trao đổi đáp án']],r:[['collude','thông đồng'],['communicate','trao đổi'],['cheat','gian lận']],x:'Several students were caught exchanging answers.',xv:'Một số học sinh bị bắt quả tang trao đổi đáp án.'},
+
+{w:'collusion',d:'secret cooperation to gain an unfair advantage',p:'/kəˈluːʒən/',pos:'n',vi:'thông đồng gian lận',e:'🤝',c:[['student collusion','sự thông đồng của học sinh'],['evidence of collusion','bằng chứng thông đồng'],['collusion case','vụ thông đồng']],r:[['conspiracy','sự thông đồng'],['cooperation','hợp tác'],['misconduct','sai phạm']],x:'The school investigated possible collusion among the candidates.',xv:'Nhà trường đã điều tra nghi ngờ thông đồng giữa các thí sinh.'},
+
+{w:'impersonation',d:'pretending to be another candidate in an examination',p:'/ɪmˌpɜːrsəˈneɪʃn/',pos:'n',vi:'thi hộ',e:'🎭',c:[['exam impersonation','thi hộ'],['impersonation fraud','mạo danh gian lận'],['identity impersonation','mạo danh danh tính']],r:[['fraud','gian lận'],['deception','lừa dối'],['identity theft','đánh cắp danh tính']],x:'Exam impersonation can lead to immediate disqualification.',xv:'Thi hộ có thể dẫn đến việc bị đình chỉ kết quả thi ngay lập tức.'},
+
+{w:'loophole',d:'a weakness in a system that can be exploited',p:'/ˈluːphoʊl/',pos:'n',vi:'kẽ hở, lỗ hổng',e:'🕳️',c:[['find a loophole','tìm ra kẽ hở'],['exploit a loophole','lợi dụng kẽ hở'],['system loophole','lỗ hổng hệ thống']],r:[['weakness','điểm yếu'],['gap','lỗ hổng'],['flaw','sai sót']],x:'Some students try to find loopholes in online testing systems.',xv:'Một số sinh viên cố tìm kẽ hở trong hệ thống thi trực tuyến.'},
+
+{w:'exploit',d:'to take unfair advantage of something',p:'/ɪkˈsplɔɪt/',pos:'v',vi:'lợi dụng',e:'🎯',c:[['exploit a loophole','lợi dụng kẽ hở'],['exploit the system','lợi dụng hệ thống'],['exploit weaknesses','lợi dụng điểm yếu']],r:[['abuse','lạm dụng'],['manipulate','thao túng'],['misuse','sử dụng sai']],x:'A few candidates exploited weaknesses in the online exam platform.',xv:'Một số thí sinh đã lợi dụng điểm yếu của nền tảng thi trực tuyến.'},
+
+{w:'shortcut',d:'an easier but often dishonest way to achieve something',p:'/ˈʃɔːrtkʌt/',pos:'n',vi:'đường tắt',e:'🚪',c:[['look for shortcuts','tìm đường tắt'],['take a shortcut','đi đường tắt'],['academic shortcut','đường tắt trong học tập']],r:[['easy way','cách dễ dàng'],['corner-cutting','làm đối phó'],['cheating','gian lận']],x:'Some students look for shortcuts instead of putting in the effort.',xv:'Một số học sinh tìm đường tắt thay vì bỏ công sức học tập.'},
+
+{w:'corner-cutting',d:'doing something poorly to save time or effort',p:'/ˈkɔːrnər kʌtɪŋ/',pos:'n',vi:'làm đối phó, làm cho có',e:'✂️',c:[['academic corner-cutting','đối phó trong học tập'],['avoid corner-cutting','tránh làm đối phó'],['corner-cutting behavior','hành vi làm qua loa']],r:[['shortcut','đường tắt'],['carelessness','cẩu thả'],['laziness','lười biếng']],x:'Cheating often begins with small acts of corner-cutting.',xv:'Gian lận thường bắt đầu từ những hành vi đối phó nhỏ.'},
+
+{w:'honor code',d:'a set of rules promoting honesty and integrity',p:'/ˈɒnər koʊd/',pos:'n',vi:'quy tắc danh dự',e:'📜',c:[['follow the honor code','tuân thủ quy tắc danh dự'],['school honor code','quy tắc của nhà trường'],['violate the honor code','vi phạm quy tắc danh dự']],r:[['integrity','chính trực'],['ethics','đạo đức'],['honesty','trung thực']],x:'Students are expected to follow the honor code at all times.',xv:'Sinh viên được kỳ vọng tuân thủ quy tắc danh dự mọi lúc.'},
+
+{w:'zero tolerance',d:'a policy of strict punishment for all violations',p:'/ˈzɪroʊ ˈtɒlərəns/',pos:'n',vi:'chính sách không khoan nhượng',e:'⛔',c:[['zero tolerance for cheating','không khoan nhượng với gian lận'],['zero tolerance policy','chính sách nghiêm khắc'],['strict enforcement','thực thi nghiêm ngặt']],r:[['discipline','kỷ luật'],['penalty','hình phạt'],['regulation','quy định']],x:'The school has a zero-tolerance policy on exam cheating.',xv:'Nhà trường áp dụng chính sách không khoan nhượng với hành vi gian lận thi cử.'},
+
+{w:'report',d:'to officially inform someone about wrongdoing',p:'/rɪˈpɔːrt/',pos:'v',vi:'báo cáo, tố giác',e:'📢',c:[['report cheating','báo cáo gian lận'],['report a violation','báo cáo vi phạm'],['anonymous report','báo cáo ẩn danh']],r:[['inform','thông báo'],['complain','khiếu nại'],['expose','phanh phui']],x:'A student reported the cheating incident to the teacher.',xv:'Một học sinh đã báo cáo vụ gian lận cho giáo viên.'},
+
+{w:'proctoring software',d:'software used to monitor candidates during online exams',p:'/ˈprɒktərɪŋ ˈsɒftwer/',pos:'n',vi:'phần mềm giám sát thi trực tuyến',e:'💻',c:[['online proctoring software','phần mềm giám sát trực tuyến'],['AI proctoring','giám sát bằng AI'],['remote proctoring','giám sát từ xa']],r:[['monitoring','giám sát'],['surveillance','theo dõi'],['online exam','thi trực tuyến']],x:'Many universities now use proctoring software during online exams.',xv:'Nhiều trường đại học hiện sử dụng phần mềm giám sát trong các kỳ thi trực tuyến.'},
+{w:'bribery',d:'the act of giving money or gifts to gain an unfair advantage',p:'/ˈbraɪbəri/',pos:'n',vi:'hối lộ, đút lót',e:'💰',c:[['exam bribery','hối lộ trong thi cử'],['accept a bribe','nhận hối lộ'],['bribery scandal','bê bối hối lộ']],r:[['corruption','tham nhũng'],['fraud','gian lận'],['favoritism','thiên vị']],x:'The school was involved in an exam bribery scandal.',xv:'Ngôi trường dính vào một vụ bê bối hối lộ trong thi cử.'},
+
+{w:'backdoor admission',d:'gaining access through unofficial influence rather than merit',p:'/ˈbækdɔːr ədˈmɪʃn/',pos:'n',vi:'đi cửa sau, vào bằng quan hệ',e:'🚪',c:[['backdoor admission case','trường hợp đi cửa sau'],['gain admission through connections','vào trường nhờ quan hệ'],['backdoor entry','vào bằng đường không chính thức']],r:[['nepotism','chủ nghĩa thân hữu'],['privilege','đặc quyền'],['favoritism','thiên vị']],x:'Many people complained about backdoor admissions at elite schools.',xv:'Nhiều người phàn nàn về việc đi cửa sau vào các trường danh tiếng.'},
+
+{w:'nepotism',d:'favoring relatives or family members unfairly',p:'/ˈnepətɪzəm/',pos:'n',vi:'ưu ái người thân, con ông cháu cha',e:'👪',c:[['accusations of nepotism','cáo buộc thiên vị người thân'],['benefit from nepotism','hưởng lợi từ quan hệ gia đình'],['nepotism in education','chủ nghĩa thân hữu trong giáo dục']],r:[['favoritism','thiên vị'],['privilege','đặc quyền'],['connection','mối quan hệ']],x:'Students criticized the system for encouraging nepotism.',xv:'Học sinh chỉ trích hệ thống vì khuyến khích tình trạng con ông cháu cha.'},
+
+{w:'favoritism',d:'unfair treatment that favors one person over others',p:'/ˈfeɪvərɪtɪzəm/',pos:'n',vi:'thiên vị',e:'⚖️',c:[['show favoritism','thể hiện sự thiên vị'],['teacher favoritism','sự thiên vị của giáo viên'],['accused of favoritism','bị tố thiên vị']],r:[['bias','thành kiến'],['nepotism','thân hữu'],['unfairness','sự không công bằng']],x:'Parents accused the school of favoritism.',xv:'Phụ huynh cáo buộc nhà trường thiên vị.'},
+
+{w:'privilege',d:'an advantage available only to a particular group',p:'/ˈprɪvəlɪdʒ/',pos:'n',vi:'đặc quyền',e:'👑',c:[['social privilege','đặc quyền xã hội'],['educational privilege','đặc quyền giáo dục'],['born with privilege','sinh ra đã có lợi thế']],r:[['advantage','lợi thế'],['status','địa vị'],['wealth','sự giàu có']],x:'Some students benefit from privileges that others do not have.',xv:'Một số học sinh hưởng những đặc quyền mà người khác không có.'},
+
+{w:'bias',d:'unfair preference for or against someone',p:'/ˈbaɪəs/',pos:'n',vi:'thiên kiến',e:'🎯',c:[['grading bias','thiên kiến khi chấm điểm'],['unconscious bias','thiên kiến vô thức'],['reduce bias','giảm thiên kiến']],r:[['prejudice','định kiến'],['favoritism','thiên vị'],['discrimination','phân biệt đối xử']],x:'Examiners are trained to reduce personal bias.',xv:'Giám khảo được đào tạo để giảm thiểu thiên kiến cá nhân.'},
+
+{w:'grade inflation',d:'the practice of giving higher grades than deserved',p:'/ˈɡreɪd ɪnˈfleɪʃn/',pos:'n',vi:'lạm phát điểm số',e:'📈',c:[['grade inflation problem','vấn đề lạm phát điểm'],['artificially high grades','điểm số cao bất thường'],['concerns about grade inflation','lo ngại về lạm phát điểm']],r:[['assessment','đánh giá'],['grading','chấm điểm'],['performance','thành tích']],x:'Universities are concerned about grade inflation.',xv:'Các trường đại học lo ngại về tình trạng lạm phát điểm số.'},
+
+{w:'achievement pressure',d:'pressure to constantly achieve high results',p:'/əˈtʃiːvmənt ˈpreʃər/',pos:'n',vi:'áp lực thành tích',e:'🏆',c:[['academic achievement pressure','áp lực thành tích học tập'],['face achievement pressure','đối mặt áp lực thành tích'],['achievement-oriented culture','văn hóa chạy theo thành tích']],r:[['competition','cạnh tranh'],['expectation','kỳ vọng'],['academic pressure','áp lực học tập']],x:'Achievement pressure can negatively affect mental health.',xv:'Áp lực thành tích có thể ảnh hưởng tiêu cực đến sức khỏe tinh thần.'},
+
+{w:'credentialism',d:'overemphasizing degrees and certificates rather than ability',p:'/krəˈdenʃəlɪzəm/',pos:'n',vi:'chủ nghĩa bằng cấp',e:'🎓',c:[['educational credentialism','chủ nghĩa bằng cấp trong giáo dục'],['criticize credentialism','chỉ trích chủ nghĩa bằng cấp'],['credentialism culture','văn hóa sính bằng cấp']],r:[['qualification','bằng cấp'],['degree','học vị'],['achievement','thành tích']],x:'Many employers are moving away from strict credentialism.',xv:'Nhiều nhà tuyển dụng đang dần rời bỏ tư duy quá coi trọng bằng cấp.'},
+
+{w:'meritocracy',d:'a system where success depends on ability and effort',p:'/ˌmerɪˈtɒkrəsi/',pos:'n',vi:'chế độ trọng năng lực',e:'🌟',c:[['promote meritocracy','thúc đẩy chế độ trọng năng lực'],['true meritocracy','một hệ thống công bằng thực sự'],['meritocratic system','hệ thống dựa trên năng lực']],r:[['fairness','công bằng'],['equality','bình đẳng'],['opportunity','cơ hội']],x:'Many people believe education should be based on meritocracy.',xv:'Nhiều người tin rằng giáo dục nên dựa trên năng lực thực sự.'},
+
+{w:'inequality',d:'a situation in which people do not have equal opportunities',p:'/ˌɪnɪˈkwɒləti/',pos:'n',vi:'bất bình đẳng',e:'📊',c:[['educational inequality','bất bình đẳng giáo dục'],['reduce inequality','giảm bất bình đẳng'],['social inequality','bất bình đẳng xã hội']],r:[['disadvantage','bất lợi'],['gap','khoảng cách'],['fairness','công bằng']],x:'Educational inequality affects exam outcomes.',xv:'Bất bình đẳng giáo dục ảnh hưởng đến kết quả thi cử.'},
+
+{w:'pull strings',d:'to use influence to get special treatment',p:'/pʊl strɪŋz/',pos:'v',vi:'dùng quan hệ để chạy chọt',e:'🕴️',c:[['pull strings for someone','chạy chọt cho ai'],['political connections','quan hệ quyền lực'],['family influence','ảnh hưởng gia đình']],r:[['connection','quan hệ'],['nepotism','thân hữu'],['influence','ảnh hưởng']],x:'Some wealthy parents try to pull strings for their children.',xv:'Một số phụ huynh giàu có tìm cách dùng quan hệ để giúp con mình.'}
+
+]},
+
+
+
+
+{name:'Kết quả thi',icon:'📊',words:[
+
+{w:'result',d:'the outcome of an exam or test',p:'/rɪˈzʌlt/',pos:'n',vi:'kết quả thi',e:'📋',c:[['exam results','kết quả thi'],['receive results','nhận kết quả'],['announce results','công bố kết quả']],r:[['score','điểm số'],['outcome','kết quả'],['performance','thành tích']],x:'The exam results will be announced next week.',xv:'Kết quả thi sẽ được công bố vào tuần tới.'},
+
+{w:'score',d:'the number of points achieved in a test',p:'/skɔːr/',pos:'n',vi:'điểm thi',e:'🎯',c:[['high score','điểm cao'],['low score','điểm thấp'],['exam score','điểm thi']],r:[['grade','điểm số'],['mark','điểm'],['result','kết quả']],x:'I was surprised by my English score.',xv:'Tôi khá bất ngờ với điểm tiếng Anh của mình.'},
+
+{w:'grade',d:'a mark showing the quality of a student’s work',p:'/ɡreɪd/',pos:'n',vi:'điểm số',e:'📝',c:[['final grade','điểm cuối kỳ'],['excellent grade','điểm xuất sắc'],['grade report','bảng điểm']],r:[['score','điểm thi'],['mark','điểm'],['assessment','đánh giá']],x:'She received an excellent grade in mathematics.',xv:'Cô ấy nhận được điểm xuất sắc môn toán.'},
+
+{w:'pass',d:'to succeed in an examination',p:'/pɑːs/',pos:'v',vi:'đỗ',e:'✅',c:[['pass an exam','đỗ kỳ thi'],['pass with distinction','đỗ xuất sắc'],['barely pass','vừa đủ đỗ']],r:[['succeed','thành công'],['qualify','đủ điều kiện'],['achieve','đạt được']],x:'I finally passed the entrance exam.',xv:'Cuối cùng tôi đã đỗ kỳ thi đầu vào.'},
+
+{w:'fail',d:'to be unsuccessful in an exam',p:'/feɪl/',pos:'v',vi:'trượt',e:'❌',c:[['fail an exam','trượt kỳ thi'],['fail a subject','trượt môn học'],['fear of failing','sợ thất bại']],r:[['retake','thi lại'],['unsuccessful','không thành công'],['mistake','sai lầm']],x:'He failed the exam despite studying hard.',xv:'Anh ấy trượt kỳ thi dù đã học rất chăm.'},
+
+{w:'meet expectations',d:'to achieve the results that were expected',p:'/miːt ˌekspekˈteɪʃənz/',pos:'v',vi:'đạt đúng kỳ vọng',e:'👍',c:[['meet expectations','đạt kỳ vọng'],['academic expectations','kỳ vọng học tập'],['fail to meet expectations','không đạt kỳ vọng']],r:[['satisfy','đáp ứng'],['achieve','đạt được'],['perform','thể hiện']],x:'My results met my expectations this year.',xv:'Kết quả năm nay đúng với kỳ vọng của tôi.'},
+
+{w:'disappointed',d:'feeling unhappy because something was not as good as expected',p:'/ˌdɪsəˈpɔɪntɪd/',pos:'adj',vi:'thất vọng',e:'😞',c:[['feel disappointed','cảm thấy thất vọng'],['deeply disappointed','rất thất vọng'],['disappointed with results','thất vọng về kết quả']],r:[['upset','buồn bã'],['discouraged','nản lòng'],['frustrated','thất vọng']],x:'I was disappointed with my math result.',xv:'Tôi thất vọng về kết quả môn toán.'},
+
+{w:'relieved',d:'feeling happy because something difficult is over',p:'/rɪˈliːvd/',pos:'adj',vi:'nhẹ nhõm',e:'😌',c:[['feel relieved','cảm thấy nhẹ nhõm'],['extremely relieved','cực kỳ nhẹ nhõm'],['relieved after exams','nhẹ nhõm sau kỳ thi']],r:[['relax','thư giãn'],['calm','bình tĩnh'],['comforted','an tâm']],x:'I felt relieved after seeing my results.',xv:'Tôi cảm thấy nhẹ nhõm sau khi xem kết quả.'},
+
+{w:'proud',d:'feeling pleased about something you have achieved',p:'/praʊd/',pos:'adj',vi:'tự hào',e:'🏆',c:[['feel proud','cảm thấy tự hào'],['make someone proud','làm ai tự hào'],['proud of achievements','tự hào về thành tích']],r:[['confident','tự tin'],['satisfied','hài lòng'],['accomplished','thành công']],x:'My parents were proud of my exam results.',xv:'Bố mẹ tôi rất tự hào về kết quả thi của tôi.'},
+
+{w:'retake',d:'to take an exam again after failing or wanting a better score',p:'/ˌriːˈteɪk/',pos:'v',vi:'thi lại',e:'🔄',c:[['retake an exam','thi lại'],['exam retake','lần thi lại'],['retake for a higher score','thi lại để nâng điểm']],r:[['retry','thử lại'],['repeat','lặp lại'],['reattempt','thi lại']],x:'She decided to retake the test next year.',xv:'Cô ấy quyết định thi lại vào năm sau.'},
+
+{w:'appeal',d:'to officially request a review of a result',p:'/əˈpiːl/',pos:'v/n',vi:'phúc khảo',e:'📨',c:[['appeal a result','xin phúc khảo'],['submit an appeal','nộp đơn phúc khảo'],['appeal process','quy trình phúc khảo']],r:[['review','xem xét lại'],['recheck','kiểm tra lại'],['request','yêu cầu']],x:'He decided to appeal his exam score.',xv:'Anh ấy quyết định xin phúc khảo điểm thi.'},
+
+{w:'remark',d:'an official recheck of an exam paper',p:'/ˌriːˈmɑːrk/',pos:'n',vi:'chấm phúc khảo',e:'🔍',c:[['request a remark','yêu cầu chấm lại'],['remark service','dịch vụ phúc khảo'],['exam remark','chấm phúc khảo bài thi']],r:[['appeal','phúc khảo'],['review','xem xét lại'],['reassessment','đánh giá lại']],x:'She requested a remark after seeing her score.',xv:'Cô ấy yêu cầu chấm lại sau khi xem điểm.'},
+
+{w:'cutoff score',d:'the minimum score needed to qualify',p:'/ˈkʌtɒf skɔːr/',pos:'n',vi:'điểm chuẩn',e:'📏',c:[['meet the cutoff score','đạt điểm chuẩn'],['cutoff score rises','điểm chuẩn tăng'],['national cutoff score','điểm chuẩn quốc gia']],r:[['requirement','yêu cầu'],['benchmark','mốc điểm'],['qualification','điều kiện']],x:'The cutoff score was higher than expected this year.',xv:'Điểm chuẩn năm nay cao hơn dự kiến.'},
+
+{w:'scholarship threshold',d:'the minimum score required for a scholarship',p:'/ˈskɒlərʃɪp ˈθreʃhoʊld/',pos:'n',vi:'mốc điểm học bổng',e:'🎓',c:[['reach the scholarship threshold','đạt mốc học bổng'],['scholarship requirement','điều kiện học bổng'],['academic scholarship','học bổng học tập']],r:[['cutoff score','điểm chuẩn'],['achievement','thành tích'],['award','phần thưởng']],x:'She exceeded the scholarship threshold by two points.',xv:'Cô ấy vượt ngưỡng học bổng hai điểm.'},
+
+{w:'performance gap',d:'the difference between expected and actual performance',p:'/pərˈfɔːrməns ɡæp/',pos:'n',vi:'khoảng cách giữa kỳ vọng và kết quả',e:'📉',c:[['performance gap','khoảng cách thành tích'],['close the performance gap','thu hẹp khoảng cách'],['unexpected performance gap','khoảng cách ngoài dự đoán']],r:[['expectation','kỳ vọng'],['result','kết quả'],['achievement','thành tích']],x:'The performance gap surprised both students and teachers.',xv:'Khoảng cách giữa kỳ vọng và kết quả khiến cả học sinh lẫn giáo viên bất ngờ.'},
+
+{w:'bounce back',d:'to recover quickly from a disappointing result',p:'/baʊns bæk/',pos:'v',vi:'vực dậy sau thất bại',e:'🌱',c:[['bounce back from failure','vực dậy sau thất bại'],['bounce back stronger','trở lại mạnh mẽ hơn'],['quickly bounce back','hồi phục nhanh']],r:[['recover','phục hồi'],['improve','cải thiện'],['persevere','kiên trì']],x:'She bounced back after failing her first attempt.',xv:'Cô ấy đã vực dậy sau lần thi trượt đầu tiên.'}
+
+]}
+
+
+
+
+];
+
+/* ============================================================
+   PHẦN XỬ LÝ (thường không cần sửa)
+   ============================================================ */
+const ALL=[];T.forEach((t,i)=>t.words.forEach(w=>{w.t=i;ALL.push(w)}));
+const load=k=>{try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return{}}};
+let P=load('mintyvocab'),K=load('mintyvocab_known'); /* K = các từ bạn đã đánh dấu "đã biết" */
+const save=()=>{try{localStorage.setItem('mintyvocab',JSON.stringify(P));localStorage.setItem('mintyvocab_known',JSON.stringify(K))}catch(e){}};
+const lv=w=>P[w.w]||0,isK=w=>!!K[w.w];
+/* ✏️ MAX = mức nhớ tối đa; MASTER = mức để tính là "đã thuộc" */
+const MAX=5,MASTER=3;
+let S={t:0,i:0,tab:'learn',q:null,f:null,all:false};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const wre=w=>new RegExp('\\b'+w.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\w*','i');
+const mt=w=>(w.x.match(wre(w))||[])[0];
+const bump=(w,n)=>{P[w.w]=Math.max(0,Math.min(MAX,lv(w)+n))};
+const hl=w=>w.x.replace(wre(w),m=>`<mark>${m}</mark>`);
+
+function say(text,slow){
+  try{
+    const s=window.speechSynthesis;s.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    /* ✏️ GIỌNG ĐỌC: 'en-US' = Anh-Mỹ, đổi thành 'en-GB' để đọc giọng Anh-Anh; 0.9 = tốc độ thường, 0.55 = tốc độ chậm */
+    u.lang='en-US';u.rate=slow?0.55:0.9;
+    const v=s.getVoices().find(v=>/en[-_]US/i.test(v.lang));if(v)u.voice=v;
+    s.speak(u);
+  }catch(e){}
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-say]');
+  if(b)say(b.dataset.say,b.dataset.slow==='1');
+});
+
+function setTopic(i){S.t=i;S.i=0;S.q=null;S.f=null;S.all=false;if(S.tab==='practice')startQ();if(S.tab==='flash')startF();render()}
+function setTab(t){S.tab=t;if(t==='practice')startQ();if(t==='flash')startF();render()}
+function pick(i){S.i=i;render()}
+/* ✅ ĐÃ SỬA LỖI: nút Từ trước/Từ sau trước đây gọi biến cục bộ nên không bấm được */
+function step(n){const l=T[S.t].words.length;S.i=(S.i+n+l)%l;render()}
+function mark(i){const w=T[S.t].words[i];if(isK(w))delete K[w.w];else K[w.w]=1;save();render()}
+
+function header(){
+  $('pills').innerHTML=T.map((t,i)=>`<button class="pill ${i===S.t?'on':''}" onclick="setTopic(${i})">${t.icon} ${t.name}</button>`).join('');
+  const m=ALL.filter(w=>isK(w)||lv(w)>=MASTER).length;
+  $('stat').textContent=`🌱 Đã thuộc ${m}/${ALL.length} từ`;
+  [['learn','t-learn'],['flash','t-flash'],['practice','t-prac']].forEach(([k,id])=>$(id).classList.toggle('on',S.tab===k));
+}
+
+function learn(){
+  const ws=T[S.t].words,w=ws[S.i],k=isK(w);
+  const list=ws.map((x,i)=>`<button class="item ${i===S.i?'on':''} ${isK(x)?'known':''}" onclick="pick(${i})"><span class="em">${x.e}</span><span><b>${x.w}${isK(x)?' ✅':''}</b><span class="dots">${[1,2,3,4,5].map(n=>`<i class="${lv(x)>=n?'f':''}"></i>`).join('')}</span></span></button>`).join('');
+  /* ✏️ ĐỔI TIÊU ĐỀ CÁC MỤC và tên nút ngay trong đoạn HTML bên dưới */
+  $('main').innerHTML=`<div class="grid"><div class="list">${list}</div>
+  <div class="card">
+    <div class="top"><div class="pic" aria-hidden="true">${w.e}</div>
+    <div><div class="word">${w.w}<span class="pos">${w.pos}</span></div><div class="ipa">${w.p}</div><div class="vi">${w.vi}</div>
+    ${w.d?`<div class="def">📘 ${w.d}</div>`:''}
+    <div class="row"><button class="btn solid" data-say="${esc(w.w)}">🔊 Nghe</button><button class="btn" data-say="${esc(w.w)}" data-slow="1">🐢 Nghe chậm</button><button class="btn ${k?'ok':''}" onclick="mark(${S.i})">${k?'✅ Đã biết (bấm để học lại)':'✔️ Mình đã biết từ này'}</button></div></div></div>
+    <h3>🔗 Collocations (cụm từ hay đi cùng)</h3>
+    <div class="cols">${w.c.map(c=>`<button class="col" data-say="${esc(c[0])}"><b>${c[0]}</b><small>${c[1]}</small></button>`).join('')}</div>
+    <h3>🌼 Từ liên quan</h3>
+    <div class="row">${w.r.map(r=>`<button class="chip" data-say="${esc(r[0])}">${r[0]} <small>· ${r[1]}</small></button>`).join('')}</div>
+    <h3>💬 Ví dụ</h3>
+    <div class="ex">${hl(w)}<small>${w.xv}</small><div class="row" style="margin-top:8px"><button class="btn" data-say="${esc(w.x)}">🔊 Nghe câu</button></div></div>
+    <div class="nav"><button class="btn" onclick="step(-1)">← Từ trước</button>
+    <button class="btn solid" onclick="setTab('flash')">🃏 Ôn bằng flashcard</button>
+    <button class="btn" onclick="step(1)">Từ sau →</button></div>
+  </div></div>`;
+}
+
+/* ===== FLASHCARD: lật thẻ, tự đánh giá; từ đã biết sẽ bị bỏ qua ===== */
+function startF(){const ws=T[S.t].words.filter(w=>S.all||!isK(w));S.f={q:shuffle(ws),n:ws.length}}
+function fnext(a){
+  const f=S.f,w=f.q[0];
+  if(a==='again')f.q.push(f.q.shift());
+  else{f.q.shift();if(a==='ok')bump(w,1);else K[w.w]=1}
+  save();render();
+}
+function flash(){
+  const f=S.f;
+  if(!f.q.length){
+    $('main').innerHTML=`<div class="card end"><div class="big">${f.n?'🎉':'✅'}</div><div class="q">${f.n?'Bạn đã xem hết thẻ rồi!':'Mọi từ trong chủ đề này đều đã biết'}</div><div class="nav" style="justify-content:center"><button class="btn solid" onclick="S.all=true;startF();render()">🔁 Ôn lại cả từ đã biết</button><button class="btn" onclick="setTab('practice')">🎯 Luyện tập</button></div></div>`;
+    return;
+  }
+  const w=f.q[0];
+  $('main').innerHTML=`<div class="card"><div class="bar"><i style="width:${(f.n-f.q.length)/f.n*100}%"></i></div>
+  <div class="qtype">Còn ${f.q.length} thẻ · bấm vào thẻ để lật</div>
+  <div class="fc" onclick="this.classList.toggle('flip')"><div class="fci">
+    <div class="face front"><div class="word">${w.w}</div><div class="ipa">${w.p}</div><span class="pos">${w.pos}</span></div>
+    <div class="face back"><div class="big sm">${w.e}</div><div class="vi">${w.vi}</div>${w.d?`<div class="def">📘 ${w.d}</div>`:''}<div class="ex">${hl(w)}</div></div>
+  </div></div>
+  <div class="row" style="justify-content:center;margin:14px 0"><button class="btn" data-say="${esc(w.w)}">🔊 Nghe</button></div>
+  <div class="nav" style="justify-content:center"><button class="btn bad" onclick="fnext('again')">😅 Chưa nhớ</button><button class="btn solid" onclick="fnext('ok')">🙂 Nhớ rồi</button><button class="btn ok" onclick="fnext('known')">✅ Đã biết – bỏ qua</button></div></div>`;
+}
+
+/* ===== LUYỆN TẬP GHI NHỚ LÂU ===== */
+function startQ(){
+  const ws=T[S.t].words.filter(w=>S.all||!isK(w));
+  if(!ws.length){S.q={empty:1};return}
+  /* ✏️ DẠNG BÀI: def = đọc định nghĩa chọn từ · blank = chọn từ điền câu · tblank = gõ từ điền câu · v2e = nhìn nghĩa gõ từ Anh · colloc = chọn cụm từ đúng · listen = nghe và gõ.
+     Mỗi từ được hỏi 3 dạng ngẫu nhiên; câu làm sai sẽ được hỏi lại ở cuối bài (lặp lại ngắt quãng giúp nhớ lâu). */
+  const qs=[];
+  ws.forEach(w=>{
+    const ts=['v2e','listen'];
+    if(w.d)ts.push('def');if(mt(w))ts.push('blank','tblank');if(w.c&&w.c.length)ts.push('colloc');
+    shuffle(ts).slice(0,3).forEach(t=>qs.push({w,t}));
+  });
+  S.q={list:shuffle(qs),i:0,score:0,n:qs.length,miss:[]};
+}
+function prep(c){
+  if(c.ready)return;c.ready=1;
+  const w=c.w;c.a=w.w;
+  if(c.t==='def'||c.t==='blank')c.o=shuffle([w,...shuffle(ALL.filter(x=>x!==w)).slice(0,3)]).map(x=>x.w);
+  if(c.t==='colloc'){
+    const k=w.c[Math.floor(Math.random()*w.c.length)];c.k=k;c.a=k[0];
+    const pool=ALL.filter(x=>x!==w&&x.c).flatMap(x=>x.c.map(y=>y[0]));
+    c.o=shuffle([k[0],...shuffle(pool).slice(0,3)]);
+  }
+  if(c.t==='tblank')c.m=mt(w);
+}
+function practice(){
+  const q=S.q;
+  if(q.empty){
+    $('main').innerHTML=`<div class="card end"><div class="big">✅</div><div class="q">Mọi từ trong chủ đề này đều đã biết</div><div class="nav" style="justify-content:center"><button class="btn solid" onclick="S.all=true;startQ();render()">🔁 Luyện cả từ đã biết</button><button class="btn" onclick="setTab('learn')">Về học từ</button></div></div>`;
+    return;
+  }
+  if(q.i>=q.list.length){
+    const pct=Math.round(q.score/q.n*100);
+    /* ✏️ LỜI KHEN / NHẮC NHỞ KHI KẾT THÚC BÀI */
+    $('main').innerHTML=`<div class="card end"><div class="big">${pct>=80?'🎉':pct>=50?'🌿':'🌱'}</div><div class="q">Bạn đúng ${q.score}/${q.n} câu ngay lần đầu</div><p class="ipa">${pct>=80?'Tuyệt vời! Từ vựng đang vào đầu rất tốt.':'Làm lại một lượt nữa để nhớ lâu hơn nhé.'}</p>${q.miss.length?`<h3>Từ cần ôn thêm</h3><div class="row" style="justify-content:center">${q.miss.map(w=>`<span class="chip">${w.w} <small>· ${w.vi}</small></span>`).join('')}</div>`:''}<div class="nav" style="justify-content:center"><button class="btn solid" onclick="startQ();render()">Làm lại</button><button class="btn" onclick="setTab('flash')">🃏 Flashcard</button><button class="btn" onclick="setTab('learn')">Về học từ</button></div></div>`;
+    return;
+  }
+  const c=q.list[q.i],w=c.w;prep(c);
+  const hint=w.w.split('').map((ch,i)=>i===0||ch===' '?ch:'_').join(' ');
+  const opts=`<div class="opts">${(c.o||[]).map((o,i)=>`<button class="opt" onclick="ans(${i})">${o}</button>`).join('')}</div>`;
+  const inp=`<input type="text" id="typed" placeholder="Gõ đáp án…" autocomplete="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')ansType()"><button class="btn solid" onclick="ansType()">Kiểm tra</button>`;
+  const blank=w.x.replace(wre(w),'_____');
+  const T2={
+    def:()=>`<div class="qtype">Đọc định nghĩa, chọn từ đúng</div><div class="q def">“${w.d}”</div>${opts}`,
+    blank:()=>`<div class="qtype">Chọn từ điền vào chỗ trống</div><div class="q">${blank}</div><p class="ipa" style="margin-bottom:12px">${w.xv}</p>${opts}`,
+    tblank:()=>`<div class="qtype">Gõ từ còn thiếu</div><div class="q">${blank}</div><p class="ipa">${w.xv}</p><p class="ipa" style="margin-bottom:12px">Gợi ý: ${hint}</p>${inp}`,
+    v2e:()=>`<div class="qtype">Nhìn nghĩa, gõ từ tiếng Anh</div><div class="q">${w.vi} <span class="pos">${w.pos}</span></div><p class="ipa" style="margin-bottom:12px">Gợi ý: ${hint}</p>${inp}`,
+    colloc:()=>`<div class="qtype">Cụm từ nào có nghĩa là…</div><div class="q">“${c.k[1]}”</div>${opts}`,
+    listen:()=>`<div class="qtype">Nghe và gõ lại từ</div><div class="big"><button class="btn solid" style="font-size:34px;padding:14px 28px" data-say="${esc(w.w)}">🔊</button></div>${inp}`
+  };
+  $('main').innerHTML=`<div class="card"><div class="bar"><i style="width:${q.i/q.list.length*100}%"></i></div>${c.retry?'<span class="pos">ôn lại 🔁</span>':''}${T2[c.t]()}<div id="fb"></div></div>`;
+  if(c.t==='listen'){setTimeout(()=>{say(w.w);const t=$('typed');if(t)t.focus()},250)}
+  else if(c.t==='tblank'||c.t==='v2e'){const t=$('typed');if(t)t.focus()}
+}
+function result(ok,c){
+  const q=S.q;if(c.done)return;c.done=true;
+  if(ok&&!c.retry)q.score++;
+  bump(c.w,ok?1:-1);save();header();
+  if(!ok){
+    if(!q.miss.includes(c.w))q.miss.push(c.w);
+    if(!c.retry)q.list.push({w:c.w,t:c.t==='v2e'?'listen':'v2e',retry:1});
+  }
+  const w=c.w;
+  /* ✏️ LỜI PHẢN HỒI KHI TRẢ LỜI ĐÚNG / SAI */
+  $('fb').innerHTML=`<div class="fb ${ok?'ok':'bad'}">${ok?'Chính xác! 🎉':'Chưa đúng, đáp án là: <b>'+c.a+'</b>'} – <b>${w.w}</b>: ${w.vi}${w.d?'<br><small>📘 '+w.d+'</small>':''}${ok?'':'<br><small>🔁 Từ này sẽ quay lại cuối bài để bạn ôn lại.</small>'}</div><div class="nav"><button class="btn" data-say="${esc(w.x)}">🔊 Nghe ví dụ</button><button class="btn solid" onclick="S.q.i++;render()">Câu tiếp →</button></div>`;
+}
+function ans(i){
+  const c=S.q.list[S.q.i];if(c.done)return;
+  const ok=c.o[i]===c.a;
+  document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(c.o[j]===c.a)b.classList.add('ok');else if(j===i)b.classList.add('bad')});
+  result(ok,c);
+}
+function ansType(){
+  const c=S.q.list[S.q.i];if(c.done)return;
+  const v=$('typed').value.trim().toLowerCase();if(!v)return;
+  $('typed').disabled=true;
+  result(v===c.a.toLowerCase()||(!!c.m&&v===c.m.toLowerCase()),c);
+}
+
+function render(){header();({learn,flash,practice})[S.tab]()}
+if(window.speechSynthesis)speechSynthesis.getVoices();
+render();
+</script>
+</body>
+</html>
